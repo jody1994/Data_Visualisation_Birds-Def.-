@@ -1,0 +1,64 @@
+import json
+
+size(3508, 2481)
+background(1)
+image("grey.jpg")
+
+showingRegistrationMarks = True
+
+def mapValue(value, fromMin, fromMax, toMin, toMax):
+    # Figure out how 'wide' each range is
+    fromSpan = fromMax - fromMin
+    toSpan = toMax - toMin
+    
+    # Convert the from range into a 0-1 range (float)
+    valueScaled = float(value - fromMin) / float(fromSpan)
+    
+    # Convert the 0-1 range into a value in the to range.
+    return toMin + (valueScaled * toSpan)
+
+def xOfDot(lon):
+    return mapValue(lon, -126, -64, 0, WIDTH)
+
+def yOfDot(lat):
+    return mapValue(lat, 23, 53, HEIGHT, 0)
+
+with open("small_set_color.json", 'r') as inputFile:
+    species_nameData = json.load(inputFile)
+
+for bird in species_nameData:
+    if bird.has_key('species-name'):
+        if bird.has_key('colors'):
+            # convert lat / lon
+            x = xOfDot(float(bird['lon']))
+            y = yOfDot(float(bird['lat']))
+            for i, c in enumerate(bird["colors"]):
+                r = c["r"] / 255.0
+                g = c["g"] / 255.0
+                b = c["b"] / 255.0
+                fill(r, g, b , 0.5)
+                diameter = bird['count'] * 40
+                x_with_offset = x - diameter / 2
+                y_with_offset = y - diameter / 2
+                if i > 0:
+                    y_with_offset -= 0.5 * diameter
+                    x_with_offset -= 0.4 * diameter
+                if i > 1:
+                    x_with_offset += 0.5 * diameter
+                oval(x_with_offset, y_with_offset , diameter, diameter)
+            
+if showingRegistrationMarks:            
+    diameter = 0.0
+    fill(1, 0, 0)
+    x = xOfDot(-124.7344)
+    y = yOfDot(48.3708)
+    oval(x, y, diameter, diameter)
+    x = xOfDot(-66.9903)
+    y = yOfDot(44.6217)
+    oval(x, y, diameter, diameter)
+    x = xOfDot(-97.2246)
+    y = yOfDot(25.9185)
+    oval(x, y, diameter, diameter)
+    x = xOfDot(-81.0527)
+    y = yOfDot(25.1254)
+    oval(x, y, diameter, diameter)
